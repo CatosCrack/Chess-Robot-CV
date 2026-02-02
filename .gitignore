@@ -1,0 +1,14 @@
+.DS_Store
+*.pyc
+.venv/
+*.log
+*.log
+*.tmp
+*.lock
+.env
+secret.json
+*.key
+*.pem
+Thumbs.db
+.vscode/
+.idea/
