@@ -12,3 +12,4 @@ secret.json
 Thumbs.db
 .vscode/
 .idea/
+my-env/
