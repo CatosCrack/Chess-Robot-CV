@@ -1,6 +1,9 @@
 import pandas as pd
 
 class Array:
+    def __init__(self, df):
+        self.df = pd.DataFrame(columns=['img', 'label'])
+        return self.df
 
     # Accepts twp parameters, the filepath of the image and the label (0/1) of the image
     # Concatenates the result to the the dataframe
