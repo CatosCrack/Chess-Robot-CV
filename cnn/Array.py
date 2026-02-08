@@ -4,6 +4,9 @@ class Array:
     def __init__(self, df):
         self.df = pd.DataFrame(columns=['img', 'label'])
         return self.df
+
+    # Accepts twp parameters, the filepath of the image and the label (0/1) of the image
+    # Concatenates the result to the the dataframe
     def attatchToArray(filepath, label):
         try:
             newRow = {"filepath": filepath, "label": label}
@@ -11,4 +14,10 @@ class Array:
             data = pd.concat([data, dataFrame], ignore_index=True)
         except Exception as e:
             print(f"Error attatching to array: {e}")
+
+    #Data is an array which index 0 is the label(Y/N) of the imag
+    #the rest is the pixel values of the image
+    def csvExport(data):
+        df = pd.DataFrame([data])
+        return df.to_csv("data/dataset.csv",index=False)
         
