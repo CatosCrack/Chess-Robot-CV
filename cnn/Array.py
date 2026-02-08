@@ -1,6 +1,9 @@
 import pandas as pd
 
 class Array:
+    def __init__(self, df):
+        self.df = pd.DataFrame(columns=['img', 'label'])
+        return self.df
     def attatchToArray(filepath, label):
         try:
             newRow = {"filepath": filepath, "label": label}
