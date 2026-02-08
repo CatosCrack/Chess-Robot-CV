@@ -23,7 +23,8 @@ for fname in images:
     ret, corners = cv.findChessboardCorners(gray, CHECKERBOARD, None)
 
     if ret:
-        objpoints.append(objp)
+        # append a copy of objp so each view has its own array
+        objpoints.append(objp.copy())
 
         corners2 = cv.cornerSubPix(
             gray, corners, (11, 11), (-1, -1), criteria
@@ -32,7 +33,7 @@ for fname in images:
 
         cv.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
         cv.imshow('Corners', img)
-        cv.waitKey(5000)
+        cv.waitKey(500)
 
 cv.destroyAllWindows()
 
@@ -45,17 +46,24 @@ print("Camera matrix:\n", mtx)
 print("Distortion coefficients:\n", dist)
 
 # === UNDISTORT ONE IMAGE ===
-img = cv.imread(images[0])
+img = cv.imread('data/img1.jpg')
 h, w = img.shape[:2]
-
 newcameramtx, roi = cv.getOptimalNewCameraMatrix(
-    mtx, dist, (w, h), 1, (w, h)
+    mtx, dist, (w, h), 0, (w, h)
 )
-
 dst = cv.undistort(img, mtx, dist, None, newcameramtx)
 
+# crop the image
 x, y, w, h = roi
 dst = dst[y:y+h, x:x+w]
-
 cv.imwrite('calibresult.png', dst)
-print("Saved undistorted image as calibresult.png")
+
+
+mean_error = 0
+for i in range(len(objpoints)):
+    imgpoints2, _ = cv.projectPoints(
+        objpoints[i], rvecs[i], tvecs[i], mtx, dist)
+    error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
+    mean_error += error
+
+print("total error: {}".format(mean_error/len(objpoints)))
