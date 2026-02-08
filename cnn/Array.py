@@ -2,7 +2,7 @@ import pandas as pd
 
 class Array:
     def __init__(self, df):
-        self.df = pd.DataFrame(columns=['img', 'label'])
+        self.df = pd.DataFrame(columns=['filepath', 'label'])
         return self.df
 
     # Accepts twp parameters, the filepath of the image and the label (0/1) of the image
@@ -17,7 +17,6 @@ class Array:
 
     #Data is an array which index 0 is the label(Y/N) of the imag
     #the rest is the pixel values of the image
-    def csvExport(data):
-        df = pd.DataFrame([data])
-        return df.to_csv("data/dataset.csv",index=False)
+    def csvExport(self):
+        return self.df.to_csv("data/dataset.csv",index=False)
         
