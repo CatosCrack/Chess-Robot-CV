@@ -7,11 +7,11 @@ class Array:
 
     # Accepts twp parameters, the filepath of the image and the label (0/1) of the image
     # Concatenates the result to the the dataframe
-    def attatchToArray(filepath, label):
+    def attatchToArray(self, dataTuple):
         try:
-            newRow = {"filepath": filepath, "label": label}
+            newRow = {"filepath": dataTuple[0], "label": dataTuple[1]}
             dataFrame = pd.DataFrame([newRow])
-            data = pd.concat([data, dataFrame], ignore_index=True)
+            self.df = pd.concat([self.df, dataFrame], ignore_index=True)
         except Exception as e:
             print(f"Error attatching to array: {e}")
 
