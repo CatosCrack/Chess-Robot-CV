@@ -12,3 +12,5 @@ secret.json
 Thumbs.db
 .vscode/
 .idea/
+.png
+__pycache__
