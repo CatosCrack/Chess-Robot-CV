@@ -12,4 +12,9 @@ secret.json
 Thumbs.db
 .vscode/
 .idea/
+<<<<<<< HEAD
 my-env/
+=======
+.png
+__pycache__
+>>>>>>> main
