@@ -46,7 +46,7 @@ print("Camera matrix:\n", mtx)
 print("Distortion coefficients:\n", dist)
 
 # === UNDISTORT ONE IMAGE ===
-img = cv.imread(images[0])
+img = cv.imread('data/img1.jpg')
 h, w = img.shape[:2]
 newcameramtx, roi = cv.getOptimalNewCameraMatrix(
     mtx, dist, (w, h), 0, (w, h)
