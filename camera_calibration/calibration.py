@@ -37,6 +37,12 @@ for fname in images:
 
 cv.destroyAllWindows()
 
+#debug
+if not objpoints:
+    raise RuntimeError("No chessboard corners were found in any image. "
+                       "Check your 'data/*.jpg' files and CHECKERBOARD size.")
+
+
 # === CALIBRATION (ONCE) ===
 ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
     objpoints, imgpoints, gray.shape[::-1], None, None
@@ -45,18 +51,21 @@ ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
 print("Camera matrix:\n", mtx)
 print("Distortion coefficients:\n", dist)
 
-# === UNDISTORT ONE IMAGE ===
-img = cv.imread('data/img1.jpg')
-h, w = img.shape[:2]
-newcameramtx, roi = cv.getOptimalNewCameraMatrix(
-    mtx, dist, (w, h), 0, (w, h)
-)
-dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+#=== UNDISTORT ALL IMAGES ===
 
-# crop the image
-x, y, w, h = roi
-dst = dst[y:y+h, x:x+w]
-cv.imwrite('calibresult.png', dst)
+for fname in images:
+    img = cv.imread(fname)
+    h, w = img.shape[:2]
+    newcameramtx, roi = cv.getOptimalNewCameraMatrix(
+        mtx, dist,(w, h), 1, (w,h)
+    )
+    dst = cv.undistort(img,mtx,dist,None,newcameramtx)
+    #crop the image
+    x, y, w, h = roi
+    dst = dst[y:y+h, x:x+w]
+    cv.imshow('Undistorted', dst)
+    cv.waitKey(0)  # press any key to advance to the next image
+cv.destroyAllWindows()
 
 
 mean_error = 0
