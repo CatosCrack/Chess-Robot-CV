@@ -30,11 +30,12 @@ def load_image_paths() -> list:
 # Takes a filename and label, moves the processed image to 
 # parsed_images and appends the filename and label to the dataset
 def label_and_move(filepath_obj: Path, label: int, array: Array) -> bool:
-    new_name = f"{label}_{filepath_obj.name}"
-    dest = Path(PARSED_IMAGES) / new_name
+    dest = Path(PARSED_IMAGES) / filepath_obj.name
     try:
         filepath_obj.rename(dest)
-        array.attachToArray((str(dest), label))
+        # Store path relative to script dir so dataset is portable across machines
+        rel_path = dest.relative_to(Path(SCRIPT_DIR))
+        array.attachToArray((rel_path.as_posix(), label))
         return True
     except Exception as e:
         st.error(f"Error: {e}")
