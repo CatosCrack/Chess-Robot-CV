@@ -1,0 +1,11 @@
+[project]
+name = "combineArrays"
+version = "0.1.0"
+description = "A simple package to combine NumPy arrays with identical shapes."
+authors = [{name = "Your Name"}]
+dependencies = ["numpy"]
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
