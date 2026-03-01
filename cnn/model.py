@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from torch import nn
 
 
@@ -27,5 +28,8 @@ class Model():
         x = self.classifier(x)
         return x
 
-    def stack_images(self, images):
+    def format_input(self, image_array: np.ndarray) -> torch.Tensor:
+        pass
+
+    def predict(self, image_array: np.ndarray) -> np.ndarray:
         pass
