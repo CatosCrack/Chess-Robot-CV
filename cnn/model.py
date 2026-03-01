@@ -23,7 +23,9 @@ class Model():
         self.classifier = nn.Sequential()
 
     def forward(self, x):
-        pass
+        x = self.features(x)
+        x = self.classifier(x)
+        return x
 
     def stack_images(self, images):
         pass
