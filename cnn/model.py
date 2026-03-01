@@ -8,11 +8,15 @@ class Model():
         # Feature extractor with convolutional layers
         # TODO: Update kernel, stride, and padding once image size is determined
         self.features = nn.Sequential(
+            # Uses padding=2 and stride=1 to preserve dimensions
             nn.Conv2d(in_channels=1, out_channels=8, kernel_size=3, padding=2, stride=1, padding_mode='replicate'),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.MaxPool2d(kernel_size=2, stride=2), # Reduces spatial dimensions by half
+            
+            # Uses padding=1 and stride=1 to preserve even dimensions
             nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, padding=1, stride=1, padding_mode='replicate'),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2) # Reduces spatial dimensions by half
         )
 
         # Classifier with fully connected layers
