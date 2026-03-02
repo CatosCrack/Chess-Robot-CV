@@ -41,7 +41,11 @@ This method implements the gradient descent algorithm and displays training and 
 The function doesn't return any values. The trained model is saved within the Model folder.
 
 **Model.format_input(image_array: np.ndarray) -> torch.Tensor**
-This method expects an array of 1x64 black and white images and creates a PyTorch tensor with the correct dimensions and normalization for the training and inference process.
+This method expects an numpy array of images with shape (num_image, width, height). It adds an additional dimension for the number of channels and normalizes pixel data by dividing the complete tensor by 255.
+
+Returns the prepared tensor for inference.
 
 **Model.predict(self, image_array: np.ndarray) -> int**
-This method expects an array of 1x64 black and white images and returns a 1x64 array with the predicted label of each of the chessboard squares.
+This method expects an numpy array of images with shape (num_image, width, height). 
+
+It returns a 1x64 array with the predicted label of each of the chessboard squares.
