@@ -14,6 +14,9 @@ from pathlib import Path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGES_TO_PARSE = os.path.join(SCRIPT_DIR, "data/images_to_parse")
 PARSED_IMAGES = os.path.join(SCRIPT_DIR, "data/parsed_images")
+PARSED_IMAGES_0 = os.path.join(SCRIPT_DIR, "data/parsed_images/0")
+PARSED_IMAGES_1 = os.path.join(SCRIPT_DIR, "data/parsed_images/1")
+
 os.makedirs(PARSED_IMAGES, exist_ok=True)
 
 # Returns a sorted lists of image absolute paths in images_to_parse with valid extensions
@@ -30,15 +33,29 @@ def load_image_paths() -> list:
 # Takes a filename and label, moves the processed image to 
 # parsed_images and appends the filename and label to the dataset
 def label_and_move(filepath_obj: Path, label: int, array: Array) -> bool:
-    new_name = f"{label}_{filepath_obj.name}"
-    dest = Path(PARSED_IMAGES) / new_name
-    try:
-        filepath_obj.rename(dest)
-        array.attachToArray((str(dest), label))
-        return True
-    except Exception as e:
-        st.error(f"Error: {e}")
-        return False
+    dest0 = Path(PARSED_IMAGES_0) / filepath_obj.name
+    dest1 = Path(PARSED_IMAGES_1) / filepath_obj.name
+    if label == 0:
+        try:
+            filepath_obj.rename(dest0)
+            # Store path relative to script dir so dataset is portable across machines
+            rel_path = dest0.relative_to(Path(SCRIPT_DIR))
+            array.attachToArray((rel_path.as_posix(), label))
+            return True
+        except Exception as e:
+            st.error(f"Error: {e}")
+            return False
+    elif label == 1:
+        try:
+            filepath_obj.rename(dest1)
+            # Store path relative to script dir so dataset is portable across machines
+            rel_path = dest1.relative_to(Path(SCRIPT_DIR))
+            array.attachToArray((rel_path.as_posix(), label))
+            return True
+        except Exception as e:
+            st.error(f"Error: {e}")
+            return False
+
 
 # Define Streamlit app
 def main():
