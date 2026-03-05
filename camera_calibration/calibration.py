@@ -14,7 +14,8 @@ objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 objpoints = []
 imgpoints = []
 
-images = glob.glob('data/*.jpg')
+images = glob.glob('camera_calibration/chessboard_imgs/*.jpg')
+
 
 for fname in images:
     img = cv.imread(fname)
@@ -37,7 +38,7 @@ for fname in images:
 
 cv.destroyAllWindows()
 
-#debug
+# debug
 if not objpoints:
     raise RuntimeError("No chessboard corners were found in any image. "
                        "Check your 'data/*.jpg' files and CHECKERBOARD size.")
@@ -51,16 +52,16 @@ ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
 print("Camera matrix:\n", mtx)
 print("Distortion coefficients:\n", dist)
 
-#=== UNDISTORT ALL IMAGES ===
+# === UNDISTORT ALL IMAGES ===
 
 for fname in images:
     img = cv.imread(fname)
     h, w = img.shape[:2]
     newcameramtx, roi = cv.getOptimalNewCameraMatrix(
-        mtx, dist,(w, h), 1, (w,h)
+        mtx, dist, (w, h), 1, (w, h)
     )
-    dst = cv.undistort(img,mtx,dist,None,newcameramtx)
-    #crop the image
+    dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+    # crop the image
     x, y, w, h = roi
     dst = dst[y:y+h, x:x+w]
     cv.imshow('Undistorted', dst)
