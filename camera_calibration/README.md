@@ -19,7 +19,7 @@ python calibration.py
 
 The script will:
 
-- Find all .jpg images in the data folder
+- Find all .jpg images in the chessboard_imgs folder
 - Detect chessboard corners in each image
 - Display the detected corners
 - Calculate calibration parameters (saved in the script)
