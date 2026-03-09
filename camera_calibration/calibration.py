@@ -52,6 +52,10 @@ ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
 print("Camera matrix:\n", mtx)
 print("Distortion coefficients:\n", dist)
 
+# Save the camera matrix and distortion coefficients to files
+np.save('camera_matrix.npy', mtx)
+np.save('distortion_coefficients.npy', dist)
+
 # === UNDISTORT ALL IMAGES ===
 
 for fname in images:
