@@ -2,11 +2,14 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader, random_split, WeightedRandomSampler
 from torchvision import transforms, datasets
-import kagglehub
+
+# NOTE: Requires 'pip install kagglehub matplotlib' to run this test.
+import kagglehub 
 import matplotlib.pyplot as plt
 import time
 import random
-from model import Model  
+
+from Model import CNNClassifier  
 
 
 def run_benchmark():
@@ -16,8 +19,9 @@ def run_benchmark():
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    torch.manual_seed(45) 
-    model = Model().to(device)
+
+    torch.manual_seed(42)
+    model = CNNClassifier().to(device)
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     
@@ -58,7 +62,7 @@ def run_benchmark():
     train_loader = DataLoader(train_data, batch_size=32, sampler=sampler)
     val_loader = DataLoader(val_data, batch_size=32, shuffle=False)
 
-    epochs = 10
+    epochs = 15
 
     for epoch in range(epochs): 
         model.train()
@@ -118,6 +122,7 @@ def run_benchmark():
         )
 
     print(f"\nTotal benchmark time: {(time.time() - start_time)/60:.2f} minutes")
+    print(f"\n Test finished. Close the image windows to exit.")
 
 
     # Visualization
@@ -136,7 +141,6 @@ def run_benchmark():
     plt.show(block=False)
 
    
-    print("\nDisplaying 3 random predictions (Real vs Predicted)...")
     plt.figure(figsize=(10, 12))
 
     for i in range(3):
@@ -168,6 +172,7 @@ def run_benchmark():
 
     plt.tight_layout()
     plt.show()
+
 
 if __name__ == "__main__":
     run_benchmark()

@@ -6,8 +6,9 @@ from torch import optim
 from torchvision import transforms, datasets
 
 
-class CNNClassifier():
+class CNNClassifier(nn.Module):
     def __init__(self) -> None:
+        super().__init__()
         
         # Feature extractor with convolutional layers
         # TODO: Update kernel, stride, and padding once image size is determined
@@ -24,7 +25,15 @@ class CNNClassifier():
         )
 
         # Classifier with fully connected layers
-        self.classifier = nn.Sequential()
+        # 50x50 -> Conv1 -> 52x52 -> Pool1 -> 26x26
+        # 26x26 -> Conv2 -> 26x26 -> Pool2 -> 13x13
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(16 * 13 * 13, 120),
+            nn.ReLU(),
+            nn.Linear(120, 1),
+            nn.Sigmoid() 
+        )
 
     def forward(self, x):
         x = self.features(x)
@@ -102,8 +111,8 @@ def train():
                 loss = criterion(outputs, labels)
                 running_validation_loss += loss.item()
                 predictions = (outputs > 0.5).float() # Convert probabilities to 1s (>0.5) and 0s (<=0.5)
-                correct_predictions += (predictions == labels).sum().item()
-                total_predictions += labels.size(0)
+                validation_correct_predictions += (predictions == labels).sum().item()
+                validation_total_predictions += labels.size(0)
 
         average_validation_loss = running_validation_loss / len(val_loader)
         validation_accuracy = 100 * validation_correct_predictions / validation_total_predictions
@@ -111,12 +120,24 @@ def train():
 
         if average_validation_loss < previous_val_loss:
             previous_val_loss = average_validation_loss
-            torch.save(model.state_dict(), 'Model/weigths.pth')
+            torch.save(model.state_dict(), 'Model/weights.pth')
             print('Model saved!')
 
 
 def predict(image_array: np.ndarray) -> np.ndarray:
-    pass
+    model = CNNClassifier()
+    # Load weights for inference
+    model.load_state_dict(torch.load('Model/weights.pth', weights_only=True))
+    model.eval() 
+
+    input_tensor = format_input(image_array)
+
+    with torch.no_grad(): 
+        outputs = model(input_tensor)
+        # Convert probabilities to binary 0/1
+        predictions = (outputs > 0.5).int()
+        
+    return predictions.numpy().flatten()
 
 if __name__ == "__main__":
     train()
