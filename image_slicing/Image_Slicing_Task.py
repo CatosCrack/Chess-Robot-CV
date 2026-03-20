@@ -194,61 +194,62 @@ else:
 if lines is None:
     print("Feedback         : Role 1 — No Hough lines found! Lower the threshold parameter")
 
-# Role 4: The Data Architect (Samuel / Infrastructure)
-# Saves every square as game_{id}_{move}_{square}.jpg and writes a JSON log.
 
-def save_dataset(image, grid_matrix, output_folder, game_id="001", move="001"):
-    squares_dir = os.path.join(output_folder, "squares")
-    os.makedirs(squares_dir, exist_ok=True)
+# Role 4 Storing 64 pieces of chessboard in a NumPy Array
+def extract_squares_array(image,grid_matrix,size=(64,64)):
+    square_images=[]
 
-    log_entries = []
-    square_idx = 1
+    for row in grid_matrix:
+        for square in row:
+            center_x=square[0]
+            center_y=square[1]
+            pts =[square[2],square[3],square[4],square[5]]
 
-    for row_idx, row in enumerate(grid_matrix):
-        for col_idx, square in enumerate(row):
-            center_x, center_y = square[0], square[1]
-            pts = [square[2], square[3], square[4], square[5]]
+            xs=[int (p[0]) for p in pts]
+            ys=[int (p[1]) for p in pts]
 
-            # Derive bounding box from the four corner points
-            xs = [int(p[0]) for p in pts]
-            ys = [int(p[1]) for p in pts]
-            x  = max(0, min(xs))
-            y  = max(0, min(ys))
-            x2 = min(image.shape[1], max(xs))
-            y2 = min(image.shape[0], max(ys))
+            x=max(0,min(xs))
+            y=max(0,min(ys))
+
+            x2=min(image.shape[1],max(xs))
+            y2=min(image.shape[0],max(ys))
 
             crop = image[y:y2, x:x2]
 
-            filename = f"game_{game_id}_{move}_{square_idx:02d}.jpg"
-            cv2.imwrite(os.path.join(squares_dir, filename), crop)
+            if crop.size==0:
+                continue
 
-            log_entries.append({
-                "square":  square_idx,
-                "row":     row_idx,
-                "col":     col_idx,
-                "center":  [int(round(center_x)), int(round(center_y))],
-                "bbox":    {"x": int(x), "y": int(y), "w": int(x2 - x), "h": int(y2 - y)},
-                "status":  "saved" if crop.size > 0 else "empty",
-                "file":    filename
-            })
+            if x2 <= x or y2 <= y:
+                crop_resized = np.zeros(size, dtype=np.uint8)  # blank image
+            else:
+                crop = image[y:y2, x:x2]
 
-            square_idx += 1
+                # Convert to grayscale
+                crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
 
-    log = {"game_id": game_id, "move": move, "total_squares": square_idx - 1, "squares": log_entries}
-    json_path = os.path.join(output_folder, f"game_{game_id}_{move}_log.json")
-    with open(json_path, "w") as f:
-        json.dump(log, f, indent=2)
+                
+                crop_resized = cv2.resize(crop_gray, size)
 
-    print(f"\nRole 4 — Saved {square_idx - 1} squares to '{squares_dir}'")
-    print(f"Role 4 — JSON log written to '{json_path}'")
+            square_images.append(crop_resized)
 
 
-# Build 8x8 grid_matrix from sorted_coordinates and call save_dataset
-if len(sorted_coordinates) == 64:
+    square_array = np.stack(square_images, axis=0)
+
+    # Normalize
+    square_array = square_array / 255.0
+    return square_array
+
+num_squares = len(sorted_coordinates)
+print(f"Total squares detected: {num_squares}")
+
+if num_squares == 64:
     grid_matrix = [sorted_coordinates[i:i+8] for i in range(0, 64, 8)]
-    save_dataset(resize_img, grid_matrix, output_folder="chess_squares_output")
+
+    square_array = extract_squares_array(resize_img, grid_matrix)
+    print(" FINAL ARRAY SHAPE:", square_array.shape)
+
 else:
-    print(f"\nRole 4 — Skipped: need 64 squares, got {len(sorted_coordinates)}")
+    print(f"❌ ERROR: Expected 64 squares, got {num_squares}")
 
 
 cv2.waitKey(0)
